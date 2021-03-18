@@ -22,7 +22,7 @@ export interface Readable<T> {
 	 * @param run subscription callback
 	 * @param invalidate cleanup callback
 	 */
-	subscribe(run: Subscriber<T>, invalidate?: Invalidator<T>): Unsubscriber;
+	subscribe(this: void, run: Subscriber<T>, invalidate?: Invalidator<T>): Unsubscriber;
 }
 
 /** Writable interface for both updating and subscribing. */
@@ -31,13 +31,13 @@ export interface Writable<T> extends Readable<T> {
 	 * Set value and inform subscribers.
 	 * @param value to set
 	 */
-	set(value: T): void;
+	set(this: void, value: T): void;
 
 	/**
 	 * Update value using callback and inform subscribers.
 	 * @param updater callback
 	 */
-	update(updater: Updater<T>): void;
+	update(this: void, updater: Updater<T>): void;
 }
 
 /** Pair of subscriber and invalidator. */
@@ -128,6 +128,7 @@ type StoresValues<T> = T extends Readable<infer U> ? U :
  * @param initial_value - when used asynchronously
  */
 export function derived<S extends Stores, T>(
+	this: void,
 	stores: S,
 	fn: (values: StoresValues<S>, set: (value: T) => void) => Unsubscriber | void,
 	initial_value?: T
@@ -145,7 +146,7 @@ export function derived<S extends Stores, T>(
 	fn: (values: StoresValues<S>) => T
 ): Readable<T>;
 
-export function derived<T>(stores: Stores, fn: Function, initial_value?: T): Readable<T> {
+export function derived<T>(this: void, stores: Stores, fn: Function, initial_value?: T): Readable<T> {
 	const single = !Array.isArray(stores);
 	const stores_array: Array<Readable<any>> = single
 		? [stores as Readable<any>]
